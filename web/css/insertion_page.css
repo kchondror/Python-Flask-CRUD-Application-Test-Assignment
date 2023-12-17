@@ -1,0 +1,10 @@
+.insertionForm{
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-bottom: 2%;
+    background-color:lightcyan;
+    border-style: solid ;
+    border-radius: 10px;
+    border-width: 2px;
+    box-shadow: 5px 5px 5px lightgray
+}

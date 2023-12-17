@@ -1,0 +1,27 @@
+.navbar{
+    border-bottom-left-radius: 20%;
+    border-bottom-right-radius: 20px;
+    background-color:lightcyan;
+    box-shadow: 5px 5px 5px grey;
+}
+
+.footer{
+    border: solid;
+    border-width: 1px;
+    background-color:lightcyan;
+}
+
+.icons{
+    width: 40px;
+    height: 40px;
+}
+
+.card{
+    box-shadow: 5px 5px 5px grey;
+}
+
+.grid-container {
+    display: grid;
+    gap: 30px;
+    grid-template-columns: auto auto auto;
+}
