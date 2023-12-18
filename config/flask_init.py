@@ -7,3 +7,5 @@ app = Flask(__name__,
             template_folder=template_dir,
             static_folder=static_dir)
 
+app.config['SECRET_KEY'] = 'demo_key'
+
