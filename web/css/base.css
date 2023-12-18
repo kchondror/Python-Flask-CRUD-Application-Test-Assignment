@@ -1,22 +1,21 @@
-.navbar{
+.navbar {
     border-bottom-left-radius: 20%;
     border-bottom-right-radius: 20px;
-    background-color:lightcyan;
+    background-color: lightcyan;
     box-shadow: 5px 5px 5px grey;
 }
 
-.footer{
-    border: solid;
-    border-width: 1px;
-    background-color:lightcyan;
+.footer {
+    border: 1px solid;
+    background-color: lightcyan;
 }
 
-.icons{
+.icons {
     width: 40px;
     height: 40px;
 }
 
-.card{
+.card {
     box-shadow: 5px 5px 5px grey;
 }
 
@@ -24,4 +23,20 @@
     display: grid;
     gap: 30px;
     grid-template-columns: auto auto auto;
+}
+
+
+.alert {
+    animation: fadeOut ease 5s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
