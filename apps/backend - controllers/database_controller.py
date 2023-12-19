@@ -5,15 +5,30 @@ import requests
 
 
 @contextmanager
-def db_session():
-    """ Creates a context with an open SQLAlchemy session.
+def db_session() -> None:
+    """
+    Creates a context manager that provides an open SQLAlchemy session and
+    closes it when the context is exited.
     """
     session = create_session()
     yield session
     session.close()
 
 
-def calculate_pagination(search_string=None):
+def calculate_pagination(search_string: str | None = None) -> tuple[list, int, int]:
+    """
+    Calculates pagination for a search query.
+    If the search string is provided, the function will perform a search using the search
+    string parameter and return the matching items.
+    If the search string is not provided, the function will return
+    a subset of records from the database
+    
+    :param search_string: A string that is used to search for specific items in the database.
+
+    :return: three values: "items": a list of sql-alchemy rows,
+    "total_pages": an integer for the total pages of the content, and
+    "page": an integer for the current page.
+    """
     page = request.args.get('page', 1, type=int)
     cards_per_page = 6
     offset = (page - 1) * cards_per_page
@@ -31,16 +46,32 @@ def calculate_pagination(search_string=None):
     return items, total_pages, page
 
 
-def CreateRecord(form_data):
-    record = Person(firstName=form_data["first_name"],
-                    lastName=form_data["last_name"],
-                    email=form_data["email"],
-                    phoneNumber=form_data["phone_number"],
-                    address=form_data["address"])
+def CreateRecord(form_data: dict) -> tuple[str, str]:
+    """
+    Creates a new record in a database table using the provided form data,
+    and returns a success message if the record is added successfully, or an error message if there is
+    an issue.
+    
+    :param form_data: A dictionary that contains the data submitted through
+    a form.
 
+    :return: a tuple containing two values.
+    A string message indicating the result of the operation.
+    A string indicating the type of message.
+    """
     with db_session() as db:
         try:
-            db.add(record)
+            sql = text(
+                "INSERT INTO person_table (firstName, lastName, email, phoneNumber, address) "
+                "VALUES (:firstName, :lastName, :email, :phoneNumber, :address) ") \
+                .bindparams(
+                firstName=form_data["first_name"],
+                lastName=form_data["last_name"],
+                email=form_data["email"],
+                phoneNumber=form_data["phone_number"],
+                address=form_data["address"])
+
+            db.execute(sql)
             db.commit()
         except IntegrityError:
             db.rollback()
@@ -52,7 +83,15 @@ def CreateRecord(form_data):
     return "New Person Added to the Database!", "success"
 
 
-def ReadRecords(offset, limit):
+def ReadRecords(offset: int, limit: int) -> list:
+    """
+    Retrieves a specified number of records from a database table, starting from a given offset.
+    
+    :param offset: The starting point of the records to be retrieved from the person_table.
+    :param limit: The maximum number of records to retrieve from the person_table.
+
+    :return: a list of sql-alchemy rows.
+    """
     with db_session() as db:
         sql = text(
             "SELECT * "
@@ -64,7 +103,17 @@ def ReadRecords(offset, limit):
     return result
 
 
-def UpdateRecord(form_data, Id):
+def UpdateRecord(form_data: dict, Id: int) -> tuple[str, str]:
+    """
+    Updates a record in the person_table with the provided form data.
+    
+    :param form_data: A dictionary that contains the updated values for the record
+    :param Id: The unique identifier of the record that needs to be updated in th person_table.
+
+    :return: a tuple containing two values.
+    A string message indicating the result of the operation.
+    A string indicating the type of message.
+    """
     with db_session() as db:
         try:
             sql = text(
@@ -87,7 +136,16 @@ def UpdateRecord(form_data, Id):
     return "Record Updated Successfully!", "success"
 
 
-def DeleteRecord(Id):
+def DeleteRecord(Id: int) -> tuple[str, str]:
+    """
+    Deletes a record from the person_table in a database using the provided Id.
+    
+    :param Id: The unique identifier of the record that you want to delete from the person_table.
+
+    :return: a tuple containing two values.
+    A string message indicating the result of the operation.
+    A string indicating the type of message.
+    """
     with db_session() as db:
         try:
             sql = text(
@@ -102,7 +160,15 @@ def DeleteRecord(Id):
     return "Record Deleted Successfully!", "danger"
 
 
-def Search(search_string):
+def Search(search_string: str) -> list:
+    """
+    Takes a search string as input, splits it into individual words, and searches
+    a database for records that match any of the words in the search string.
+    
+    :param search_string: A string that contains the keywords or terms that you want to search for in the person_table
+
+    :return: a list of sql-alchemy rows.
+    """
     result_list = []
     search_list = search_string.split()
 
@@ -120,7 +186,14 @@ def Search(search_string):
     return result_list
 
 
-def GetPerson(Id):
+def GetPerson(Id: int) -> list:
+    """
+    Retrieves a person's information from a database based on their ID.
+    
+    :param Id: The unique identifier of the person you want to retrieve from the person_table.
+
+    :return: a list of sql-alchemy rows (one).
+    """
     with db_session() as db:
         sql = text(
             "SELECT * "
@@ -131,7 +204,12 @@ def GetPerson(Id):
     return result
 
 
-def count_records():
+def count_records() -> int:
+    """
+    Counts the number of records in the person_table.
+
+    :return: an integer for the count of records.
+    """
     with db_session() as db:
         result = db.query(Person).count()
 
@@ -139,7 +217,8 @@ def count_records():
 
 
 if __name__ == "__main__":
-
+    """This code block provides a way to add data to the database using the random user generator site(
+    "https://randomuser.me/"). """
     for i in range(15):
         fake_person = requests.get('https://randomuser.me/api/').json()['results'][0]
 

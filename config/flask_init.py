@@ -1,3 +1,4 @@
+# Creating a Flask application instance and configuring various settings.
 from lib.flask_imports import *
 
 template_dir = os.path.abspath('../frontend - views')
