@@ -4,17 +4,42 @@ from data.models.insertion_form import InsertionForm
 from wtforms import Label
 
 
-@app.route('/update/<int:id>', methods=["GET", "POST"])
-def update(id):
-    form = InsertionForm()
+@app.route('/', methods=["GET", "POST"])
+def home_page():
 
     if request.method == "POST":
-        message, category = db.UpdateRecord(form.data, id)
+        search_string = request.form['search_bar']
+        if search_string:
+            items_on_page, total_pages, page = db.calculate_pagination(search_string)
+            return render_template("index.html", people=items_on_page, total_pages=total_pages, page=page, isSearch=True)
+
+    items_on_page, total_pages, page = db.calculate_pagination()
+    return render_template("index.html", people=items_on_page, total_pages=total_pages, page=page, isSearch=False)
+
+
+@app.route('/insertion', methods=["GET", "POST"])
+def insertion_page():
+    form = InsertionForm()
+    if request.method == "POST" and form.validate_on_submit():
+        message, category = db.CreateRecord(form.data)
+        flash(message, category=category)
+
+        return redirect(url_for('insertion_page'))
+
+    return render_template("insertion.html",
+                           form=form)
+
+@app.route('/update/<int:Id>', methods=["GET", "POST"])
+def update(Id):
+    form = InsertionForm()
+
+    if request.method == "POST" and form.validate():
+        message, category = db.UpdateRecord(form.data, Id)
         flash(message, category=category)
 
         return redirect(url_for('home_page'))
 
-    result = db.GetPerson(id)
+    result = db.GetPerson(Id)
 
     form.first_name.default = result[0][1]
     form.last_name.default = result[0][2]
@@ -28,32 +53,12 @@ def update(id):
     return render_template("update.html", form=form)
 
 
-@app.route('/delete/<int:id>')
-def delete(id):
-    message, category = db.DeleteRecord(id)
+@app.route('/delete/<int:Id>')
+def delete(Id):
+    message, category = db.DeleteRecord(Id)
     flash(message, category=category)
 
     return redirect(url_for('home_page'))
-
-
-@app.route('/', methods=["GET", "POST"])
-def home_page():
-    items_on_page, total_pages, page = db.calculate_pagination()
-
-    return render_template("index.html", people=items_on_page, total_pages=total_pages, page=page)
-
-
-@app.route('/insertion', methods=["GET", "POST"])
-def insertion_page():
-    form = InsertionForm()
-    if request.method == "POST":
-        message, category = db.CreateRecord(form.data)
-        flash(message, category=category)
-
-        return redirect(url_for('insertion_page'))
-
-    return render_template("insertion.html",
-                           form=form)
 
 
 if __name__ == "__main__":

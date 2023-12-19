@@ -10,10 +10,10 @@ class Person(_BASE_CLASS):
     firstName = Column("firstName", String(22), nullable=False)
     lastName = Column("lastName", String(22), nullable=False)
     email = Column("email", String(255), nullable=False, unique=True)
-    phoneNumber = Column("phoneNumber", Integer, nullable=False)
+    phoneNumber = Column("phoneNumber", VARCHAR(50), nullable=False)
     address = Column("address", String(255))
 
-    def __init__(self, firstName, lastName, email, phoneNumber=None, address=None):
+    def __init__(self, firstName, lastName, email, phoneNumber, address=None):
         self.firstName = firstName
         self.lastName = lastName
         self.email = email
