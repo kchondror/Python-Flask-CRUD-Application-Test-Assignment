@@ -27,7 +27,7 @@
 
 
 .alert {
-    animation: fadeOut ease 5s;
+    animation: fadeOut ease 7s;
     animation-fill-mode: forwards;
 }
 

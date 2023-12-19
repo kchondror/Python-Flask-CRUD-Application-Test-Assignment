@@ -1,11 +1,35 @@
 from config.flask_init import *
 import database_controller as db
 from data.models.insertion_form import InsertionForm
+from wtforms import Label
+
+
+@app.route('/update/<int:id>', methods=["GET", "POST"])
+def update(id):
+    form = InsertionForm()
+
+    if request.method == "POST":
+        message, category = db.UpdateRecord(form.data, id)
+        flash(message, category=category)
+
+        return redirect(url_for('home_page'))
+
+    result = db.GetPerson(id)
+
+    form.first_name.default = result[0][1]
+    form.last_name.default = result[0][2]
+    form.email.default = result[0][3]
+    form.phone_number.default = result[0][4]
+    form.address.default = result[0][5]
+    form.save_button.label = Label(form.save_button.id, 'Update')
+
+    form.process()
+
+    return render_template("update.html", form=form)
 
 
 @app.route('/delete/<int:id>')
 def delete(id):
-
     message, category = db.DeleteRecord(id)
     flash(message, category=category)
 
