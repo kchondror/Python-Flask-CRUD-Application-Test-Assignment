@@ -1,3 +1,10 @@
+import sys, os
+
+_dirname = os.path.dirname
+_ROOT_DIR = _dirname(_dirname(_dirname(os.path.abspath(__file__))))
+
+sys.path.append(_ROOT_DIR)
+
 from config.flask_init import *
 import database_controller as db
 from data.models.insertion_form import InsertionForm
